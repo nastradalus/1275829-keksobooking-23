@@ -55,7 +55,7 @@ const createAd = (index) => {
 
   return {
     author: {
-      avatar: (index <= 8) ? `img/avatars/user0${index}.png` : '',
+      avatar: (index + 1 <= 8) ? `img/avatars/user0${index + 1}.png` : '',
     },
     offer: {
       title: AD_NAMES[index],
@@ -77,7 +77,7 @@ const createAd = (index) => {
   };
 };
 
-const ads = new Array(AD_COUNT).fill(null).map((value, index) => createAd(index + 1));
+const ads = new Array(AD_COUNT).fill(null).map((value, index) => createAd(index));
 
 // eslint-disable-next-line no-console
 console.log(ads);
