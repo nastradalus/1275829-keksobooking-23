@@ -24,6 +24,13 @@ export const AD_DESCRIPTIONS = [
 ];
 
 export const AD_TYPES = ['palace', 'flat', 'house', 'bungalow', 'hotel'];
+export const AD_TYPES_RU = {
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalow: 'Бунгало',
+  hotel: 'Отель',
+};
 export const AD_CHECKIN_TIMES = ['12:00', '13:00', '14:00'];
 export const AD_CHECKOUT_TIMES = ['12:00', '13:00', '14:00'];
 export const AD_FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
