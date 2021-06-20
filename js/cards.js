@@ -1,73 +1,73 @@
 import {ads} from './data.js';
-import {AD_TYPES_RU, AD_FEATURES, AD_COUNT} from './constants.js';
+import {AD_TYPES_RU, AD_FEATURES} from './constants.js';
 
-const map = document.querySelector('#map-canvas');
-const cardTemplate = document.querySelector('#card').content;
+const mapContainer = document.querySelector('#map-canvas');
+const cardTemplateContainer = document.querySelector('#card').content;
 
 const setSimpleProperties = (card, info) => {
-  const cardProperty = {
-    title: {
+  const cardProperties = [
+    {
       initValue: info.offer.title,
       setValue: info.offer.title,
-      querySelector: '.popup__title',
+      selector: '.popup__title',
       attribute: 'textContent',
     },
-    address: {
+    {
       initValue: info.offer.address,
       setValue: info.offer.address,
-      querySelector: '.popup__text--address',
+      selector: '.popup__text--address',
       attribute: 'textContent',
     },
-    price: {
+    {
       initValue: info.offer.address,
-      setValue: `${info.offer.price} <span>₽/ночь</span>`,
-      querySelector: '.popup__text--price',
-      attribute: 'innerHTML',
+      setValue: `${info.offer.price} ₽/ночь`,
+      selector: '.popup__text--price',
+      attribute: 'textContent',
     },
-    type: {
+    {
       initValue: info.offer.type,
       setValue: AD_TYPES_RU[info.offer.type],
-      querySelector: '.popup__type',
+      selector: '.popup__type',
       attribute: 'textContent',
     },
-    capacity: {
+    {
       initValue: info.offer.rooms && info.offer.guests,
       setValue: `${info.offer.rooms} комнаты для ${info.offer.guests} гостей`,
-      querySelector: '.popup__text--capacity',
+      selector: '.popup__text--capacity',
       attribute: 'textContent',
     },
-    time: {
+    {
       initValue: info.offer.checkin && info.offer.checkout,
       setValue: `Заезд после ${info.offer.checkin}, выезд до ${info.offer.checkout}`,
-      querySelector: '.popup__text--time',
+      selector: '.popup__text--time',
       attribute: 'textContent',
     },
-    description: {
+    {
       initValue: info.offer.description,
       setValue: info.offer.description,
-      querySelector: '.popup__description',
+      selector: '.popup__description',
       attribute: 'textContent',
     },
-    avatar: {
+    {
       initValue: info.author.avatar,
       setValue: info.author.avatar,
-      querySelector: '.popup__avatar',
+      selector: '.popup__avatar',
       attribute: 'src',
     },
-  };
+  ];
 
-  for (const propertyName in cardProperty) {
-    const property = cardProperty[propertyName];
+  for (const cardProperty of cardProperties) {
+    const propertyContainer = card.querySelector(cardProperty.selector);
 
-    if (property.initValue) {
-      card.querySelector(property.querySelector)[property.attribute] = property.setValue;
+    if (cardProperty.initValue && propertyContainer) {
+      propertyContainer[cardProperty.attribute] = cardProperty.setValue;
     } else {
-      card.querySelector(property.querySelector).remove();
+      propertyContainer.remove();
     }
   }
 };
 
-const setFeatures = (card, info) => {
+const setFeaturesProperty = (card, info) => {
   const featuresContainer = card.querySelector('.popup__features');
   const features = info.offer.features;
   const unusedFeatures = AD_FEATURES.filter((feature) => !features.includes(feature));
@@ -79,12 +79,11 @@ const setFeatures = (card, info) => {
   } else {
     featuresContainer.remove();
   }
-
 };
 
-const setImages = (card, info) => {
+const setImagesProperty = (card, data) => {
   const imageContainer = card.querySelector('.popup__photos');
-  const imagePaths = info.offer.photos;
+  const imagePaths = data.offer.photos;
 
   if (imagePaths.length) {
     for (const imagePath of imagePaths) {
@@ -98,27 +97,26 @@ const setImages = (card, info) => {
   } else {
     imageContainer.remove();
   }
-
 };
 
-const createCard = (info) => {
-  const card = cardTemplate.cloneNode(true);
+const createCard = (dataElement) => {
+  const cardContainer = cardTemplateContainer.cloneNode(true);
 
-  setSimpleProperties(card, info);
-  setFeatures(card, info);
-  setImages(card, info);
+  setSimpleProperties(cardContainer, dataElement);
+  setFeaturesProperty(cardContainer, dataElement);
+  setImagesProperty(cardContainer, dataElement);
 
-  return card;
+  return cardContainer;
 };
 
-const createCards = (count) => {
-  const cards = document.createDocumentFragment();
+const createCards = (dataElements) => {
+  const cardsContainer = document.createDocumentFragment();
 
-  for (let index = 0; index < count; index++) {
-    cards.appendChild(createCard(ads[index]));
+  for (let index = 0; index < dataElements.length; index++) {
+    cardsContainer.appendChild(createCard(dataElements[index]));
   }
 
-  map.appendChild(cards);
+  return cardsContainer;
 };
 
-createCards(AD_COUNT);
+mapContainer.appendChild(createCards(ads));
