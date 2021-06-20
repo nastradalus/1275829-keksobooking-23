@@ -4,53 +4,53 @@ import {AD_TYPES_RU, AD_FEATURES} from './constants.js';
 const mapContainer = document.querySelector('#map-canvas');
 const cardTemplateContainer = document.querySelector('#card').content;
 
-const setSimpleProperties = (card, info) => {
+const setSimpleProperties = (card, data) => {
   const cardProperties = [
     {
-      initValue: info.offer.title,
-      setValue: info.offer.title,
+      initValue: data.offer.title,
+      setValue: data.offer.title,
       selector: '.popup__title',
       attribute: 'textContent',
     },
     {
-      initValue: info.offer.address,
-      setValue: info.offer.address,
+      initValue: data.offer.address,
+      setValue: data.offer.address,
       selector: '.popup__text--address',
       attribute: 'textContent',
     },
     {
-      initValue: info.offer.address,
-      setValue: `${info.offer.price} ₽/ночь`,
+      initValue: data.offer.address,
+      setValue: `${data.offer.price} ₽/ночь`,
       selector: '.popup__text--price',
       attribute: 'textContent',
     },
     {
-      initValue: info.offer.type,
-      setValue: AD_TYPES_RU[info.offer.type],
+      initValue: data.offer.type,
+      setValue: AD_TYPES_RU[data.offer.type],
       selector: '.popup__type',
       attribute: 'textContent',
     },
     {
-      initValue: info.offer.rooms && info.offer.guests,
-      setValue: `${info.offer.rooms} комнаты для ${info.offer.guests} гостей`,
+      initValue: data.offer.rooms && data.offer.guests,
+      setValue: `${data.offer.rooms} комнаты для ${data.offer.guests} гостей`,
       selector: '.popup__text--capacity',
       attribute: 'textContent',
     },
     {
-      initValue: info.offer.checkin && info.offer.checkout,
-      setValue: `Заезд после ${info.offer.checkin}, выезд до ${info.offer.checkout}`,
+      initValue: data.offer.checkin && data.offer.checkout,
+      setValue: `Заезд после ${data.offer.checkin}, выезд до ${data.offer.checkout}`,
       selector: '.popup__text--time',
       attribute: 'textContent',
     },
     {
-      initValue: info.offer.description,
-      setValue: info.offer.description,
+      initValue: data.offer.description,
+      setValue: data.offer.description,
       selector: '.popup__description',
       attribute: 'textContent',
     },
     {
-      initValue: info.author.avatar,
-      setValue: info.author.avatar,
+      initValue: data.author.avatar,
+      setValue: data.author.avatar,
       selector: '.popup__avatar',
       attribute: 'src',
     },
@@ -67,12 +67,12 @@ const setSimpleProperties = (card, info) => {
   }
 };
 
-const setFeaturesProperty = (card, info) => {
+const setFeaturesProperty = (card, data) => {
   const featuresContainer = card.querySelector('.popup__features');
-  const features = info.offer.features;
-  const unusedFeatures = AD_FEATURES.filter((feature) => !features.includes(feature));
+  const cardFeatures = data.offer.features;
+  const unusedFeatures = AD_FEATURES.filter((feature) => !cardFeatures.includes(feature));
 
-  if (features.length) {
+  if (cardFeatures.length) {
     for (const unusedFeature of unusedFeatures) {
       featuresContainer.querySelector(`[class*="--${unusedFeature}"]`).remove();
     }
