@@ -5,7 +5,8 @@ import {
   AD_CHECKIN_TIMES,
   AD_CHECKOUT_TIMES,
   AD_FEATURES,
-  AD_PHOTOS
+  AD_PHOTOS,
+  AD_COUNT
 } from './constants.js';
 
 import {
@@ -15,7 +16,7 @@ import {
   getRandomArrayElements
 } from './utils.js';
 
-export const createAd = (index) => {
+const createAd = (index) => {
   const latValue = getRandomPositiveFloat(35.65000, 35.70000, 5);
   const lngValue = getRandomPositiveFloat(139.70000, 139.80000, 5);
 
@@ -42,3 +43,5 @@ export const createAd = (index) => {
     },
   };
 };
+
+export const ads = new Array(AD_COUNT).fill(null).map((value, index) => createAd(index));
