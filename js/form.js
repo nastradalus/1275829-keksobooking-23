@@ -22,6 +22,9 @@ const typePrice = {
   palace: 10000,
 };
 
+const MAX_ROOMS = 100;
+const MIN_CAPACITY = 0;
+
 const disablePage = () => {
   formContainer.classList.add(formDisableClass);
   mapFiltersContainer.classList.add(mapFiltersDisableClass);
@@ -102,9 +105,9 @@ formCapacityContainer.addEventListener('change', () => {
   const capacityValue = +formCapacityContainer.value;
   const roomValue = +formRoomNumberContainer.value;
 
-  if (roomValue !== 100 && (capacityValue > roomValue || capacityValue === 0)) {
+  if (roomValue !== MAX_ROOMS && (capacityValue > roomValue || capacityValue === MIN_CAPACITY)) {
     formCapacityContainer.setCustomValidity(`Для текущего количества комнат возможное количество гостей: не меньше 1 и не больше ${roomValue}`);
-  } else if (roomValue === 100 && capacityValue !== 0) {
+  } else if (roomValue === MAX_ROOMS && capacityValue !== MIN_CAPACITY) {
     formCapacityContainer.setCustomValidity('100 комнат не для гостей');
   } else {
     formCapacityContainer.setCustomValidity('');
