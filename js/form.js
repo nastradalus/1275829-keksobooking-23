@@ -14,11 +14,12 @@ const formTimeOutContainer = document.querySelector('#timeout');
 const formRoomNumberContainer = document.querySelector('#room_number');
 const formCapacityContainer = document.querySelector('#capacity');
 
-let availableRoomCapacity;
-
-const setAvailableRoomCapacity = () => {
-  const formRoomNumberOptionSelected = formRoomNumberContainer.querySelector(`option[value="${formRoomNumberContainer.value}"]`);
-  availableRoomCapacity = +formRoomNumberOptionSelected.dataset.avaliableCapacity;
+const typePrice = {
+  bungalow: 0,
+  flat: 1000,
+  hotel: 3000,
+  house: 5000,
+  palace: 10000,
 };
 
 const disablePage = () => {
@@ -45,8 +46,6 @@ const enablePage = () => {
   for (const mapFiltersControlsContainer of mapFiltersControlsContainers) {
     mapFiltersControlsContainer.disabled = false;
   }
-
-  setAvailableRoomCapacity();
 };
 
 disablePage();
@@ -69,8 +68,7 @@ formTitleContainer.addEventListener('input', () => {
 });
 
 formTypeContainer.addEventListener('change', () => {
-  const formTypeOptionSelectedContainer = formTypeContainer.querySelector(`option[value="${formTypeContainer.value}"]`);
-  const typeMinPrice = formTypeOptionSelectedContainer.dataset.minPrice;
+  const typeMinPrice = typePrice[formTypeContainer.value];
 
   formPriceContainer.min = typeMinPrice;
   formPriceContainer.placeholder = typeMinPrice;
@@ -100,14 +98,13 @@ formTimeOutContainer.addEventListener('change', () => {
   formTimeInContainer.value = formTimeOutContainer.value;
 });
 
-formRoomNumberContainer.addEventListener('change', setAvailableRoomCapacity);
-
 formCapacityContainer.addEventListener('change', () => {
-  const value = +formCapacityContainer.value;
+  const capacityValue = +formCapacityContainer.value;
+  const roomValue = +formRoomNumberContainer.value;
 
-  if (availableRoomCapacity !== 0 && (value > availableRoomCapacity || value === 0)) {
-    formCapacityContainer.setCustomValidity(`Для текущего количества комнат возможное количество гостей: не меньше 1 и не больше ${availableRoomCapacity}`);
-  } else if (availableRoomCapacity === 0 && value !== 0) {
+  if (roomValue !== 100 && (capacityValue > roomValue || capacityValue === 0)) {
+    formCapacityContainer.setCustomValidity(`Для текущего количества комнат возможное количество гостей: не меньше 1 и не больше ${roomValue}`);
+  } else if (roomValue === 100 && capacityValue !== 0) {
     formCapacityContainer.setCustomValidity('100 комнат не для гостей');
   } else {
     formCapacityContainer.setCustomValidity('');
