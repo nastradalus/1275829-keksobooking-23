@@ -13,6 +13,7 @@ const formTimeInContainer = document.querySelector('#timein');
 const formTimeOutContainer = document.querySelector('#timeout');
 const formRoomNumberContainer = document.querySelector('#room_number');
 const formCapacityContainer = document.querySelector('#capacity');
+const formAddressContainer = document.querySelector('#address');
 
 const typePrice = {
   bungalow: 0,
@@ -51,8 +52,9 @@ const enablePage = () => {
   }
 };
 
-disablePage();
-setTimeout(enablePage, 1000);
+const updateAddress = (lat, lng) => {
+  formAddressContainer.value = `${lat}, ${lng}`;
+};
 
 formTitleContainer.addEventListener('input', () => {
   const valueLength = formTitleContainer.value.length;
@@ -115,3 +117,7 @@ formCapacityContainer.addEventListener('change', () => {
 
   formCapacityContainer.reportValidity();
 });
+
+disablePage();
+
+export {enablePage, updateAddress};
