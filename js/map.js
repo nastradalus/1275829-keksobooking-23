@@ -81,7 +81,7 @@ const createMarker = (ad) => {
   cardMarker
     .addTo(map)
     .bindPopup(
-      createCard(ad),
+      () => createCard(ad),
       {
         keepInView: true,
       },
