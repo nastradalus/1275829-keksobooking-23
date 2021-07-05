@@ -13,6 +13,7 @@ const formTimeInContainer = document.querySelector('#timein');
 const formTimeOutContainer = document.querySelector('#timeout');
 const formRoomNumberContainer = document.querySelector('#room_number');
 const formCapacityContainer = document.querySelector('#capacity');
+const formAddressContainer = document.querySelector('#address');
 
 const typePrice = {
   bungalow: 0,
@@ -21,6 +22,9 @@ const typePrice = {
   house: 5000,
   palace: 10000,
 };
+
+const MAX_ROOMS = 100;
+const MIN_CAPACITY = 0;
 
 const disablePage = () => {
   formContainer.classList.add(formDisableClass);
@@ -48,8 +52,9 @@ const enablePage = () => {
   }
 };
 
-disablePage();
-setTimeout(enablePage, 1000);
+const updateAddress = (lat, lng) => {
+  formAddressContainer.value = `${lat}, ${lng}`;
+};
 
 formTitleContainer.addEventListener('input', () => {
   const valueLength = formTitleContainer.value.length;
@@ -102,9 +107,9 @@ formCapacityContainer.addEventListener('change', () => {
   const capacityValue = +formCapacityContainer.value;
   const roomValue = +formRoomNumberContainer.value;
 
-  if (roomValue !== 100 && (capacityValue > roomValue || capacityValue === 0)) {
+  if (roomValue !== MAX_ROOMS && (capacityValue > roomValue || capacityValue === MIN_CAPACITY)) {
     formCapacityContainer.setCustomValidity(`Для текущего количества комнат возможное количество гостей: не меньше 1 и не больше ${roomValue}`);
-  } else if (roomValue === 100 && capacityValue !== 0) {
+  } else if (roomValue === MAX_ROOMS && capacityValue !== MIN_CAPACITY) {
     formCapacityContainer.setCustomValidity('100 комнат не для гостей');
   } else {
     formCapacityContainer.setCustomValidity('');
@@ -112,3 +117,7 @@ formCapacityContainer.addEventListener('change', () => {
 
   formCapacityContainer.reportValidity();
 });
+
+disablePage();
+
+export {enablePage, updateAddress};

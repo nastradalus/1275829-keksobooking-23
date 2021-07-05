@@ -1,7 +1,5 @@
-import {ads} from './data.js';
 import {AD_TYPES_RU, AD_FEATURES} from './constants.js';
 
-const mapContainer = document.querySelector('#map-canvas');
 const cardTemplateContainer = document.querySelector('#card').content;
 
 const setSimpleProperties = (card, data) => {
@@ -109,14 +107,4 @@ const createCard = (dataElement) => {
   return cardContainer;
 };
 
-const createCards = (dataElements) => {
-  const cardsContainer = document.createDocumentFragment();
-
-  for (let index = 0; index < dataElements.length; index++) {
-    cardsContainer.appendChild(createCard(dataElements[index]));
-  }
-
-  return cardsContainer;
-};
-
-mapContainer.appendChild(createCards(ads));
+export {createCard};
