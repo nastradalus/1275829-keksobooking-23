@@ -89,6 +89,11 @@ fieldset {
   background-color: #dddddd;
 }
 
+/* Контейнер сообщения об ошибке */
+.map__message {
+  width: 100%;
+  color: red;
+}
 
 /**
  * Фильтры объявления

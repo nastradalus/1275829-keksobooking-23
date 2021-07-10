@@ -1,7 +1,11 @@
-import {enablePage, updateAddress} from './form.js';
+import {enableAdForm, enableMapFilter, updateAddress} from './form.js';
 import {roundFloat} from './utils.js';
-import {ads} from './data.js';
 import {createCard} from './cards.js';
+import {createFetch} from './create-fetch.js';
+
+const map = L.map('map-canvas');
+const dataErrorLoadContainer = document.querySelector('#data-error').content;
+const messageContainer = document.querySelector('#map-message');
 
 const START_LAT = 35.68950;
 const START_LNG = 139.69171;
@@ -19,11 +23,51 @@ const ICON_CARD_HEIGHT = 40;
 const ICON_CARD_TIP_X = 20;
 const ICON_CARD_TIP_Y = 40;
 
-const map = L.map('map-canvas')
-  .on('load', () => {
-    enablePage();
-    updateAddress(START_LAT, START_LNG);
-  })
+const createMarker = (ad) => {
+  const {location: {lat, lng}} = ad;
+  const icon = L.icon({
+    iconUrl: ICON_CARD_PATH,
+    iconSize: [ICON_CARD_WIDTH, ICON_CARD_HEIGHT],
+    iconAnchor: [ICON_CARD_TIP_X, ICON_CARD_TIP_Y],
+  });
+
+  const cardMarker = L.marker(
+    {
+      lat,
+      lng,
+    },
+    {
+      icon,
+    },
+  );
+
+  cardMarker
+    .addTo(map)
+    .bindPopup(
+      () => createCard(ad),
+      {
+        keepInView: true,
+      },
+    );
+};
+
+const getAds = createFetch(
+  (ads) => {
+    enableMapFilter();
+    ads.forEach((ad) => {
+      createMarker(ad);
+    });
+  },
+  (error) => {
+    messageContainer.appendChild(dataErrorLoadContainer);
+    throw new Error(`${error}`);
+  });
+
+map.on('load', () => {
+  enableAdForm();
+  updateAddress(START_LAT, START_LNG);
+  getAds().then();
+})
   .setView({
     lat: START_LAT,
     lng: START_LNG,
@@ -60,34 +104,16 @@ mainMarker.on('moveend', (evt) => {
   updateAddress(roundFloat(coordinate.lat), roundFloat(coordinate.lng));
 });
 
-const createMarker = (ad) => {
-  const {location: {lat, lng}} = ad;
-  const icon = L.icon({
-    iconUrl: ICON_CARD_PATH,
-    iconSize: [ICON_CARD_WIDTH, ICON_CARD_HEIGHT],
-    iconAnchor: [ICON_CARD_TIP_X, ICON_CARD_TIP_Y],
+const setMapInitState = () => {
+  mainMarker.setLatLng({
+    lat: START_LAT,
+    lng: START_LNG,
   });
 
-  const cardMarker = L.marker(
-    {
-      lat,
-      lng,
-    },
-    {
-      icon,
-    },
-  );
-
-  cardMarker
-    .addTo(map)
-    .bindPopup(
-      () => createCard(ad),
-      {
-        keepInView: true,
-      },
-    );
+  map.setView({
+    lat: START_LAT,
+    lng: START_LNG,
+  }, MAP_ZOOM);
 };
 
-ads.forEach((ad) => {
-  createMarker(ad);
-});
+export {setMapInitState};

@@ -1,3 +1,6 @@
+import {sendFormData} from './create-fetch.js';
+import {setMapInitState} from './map.js';
+
 const formContainer = document.querySelector('.ad-form');
 const formControlsContainers = document.querySelectorAll('.ad-form-header, .ad-form__element');
 const mapFiltersContainer = document.querySelector('.map__filters');
@@ -39,22 +42,64 @@ const disablePage = () => {
   }
 };
 
-const enablePage = () => {
-  formContainer.classList.remove(formDisableClass);
+const enableMapFilter = () => {
   mapFiltersContainer.classList.remove(mapFiltersDisableClass);
-
-  for (const formControlsContainer of formControlsContainers) {
-    formControlsContainer.disabled = false;
-  }
 
   for (const mapFiltersControlsContainer of mapFiltersControlsContainers) {
     mapFiltersControlsContainer.disabled = false;
   }
 };
 
+const enableAdForm = () => {
+  formContainer.classList.remove(formDisableClass);
+
+  for (const formControlsContainer of formControlsContainers) {
+    formControlsContainer.disabled = false;
+  }
+};
+
 const updateAddress = (lat, lng) => {
   formAddressContainer.value = `${lat}, ${lng}`;
 };
+
+const showStatusMessage = (status) => {
+  const message = document.querySelector(`#${status}`).content.querySelector(`.${status}`).cloneNode(true);
+  document.querySelector('body').appendChild(message);
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' || event.key === 'Esc') {
+      event.preventDefault();
+      message.remove();
+    }
+  });
+
+  message.addEventListener('click', () => {
+    message.remove();
+  });
+};
+
+formContainer.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(formContainer);
+
+  sendFormData(
+    formContainer.action,
+    formData,
+    () => {
+      showStatusMessage('success');
+    },
+    () => {
+      showStatusMessage('error');
+    }).then();
+});
+
+formContainer.addEventListener('reset', () => {
+  // event.preventDefault();
+
+  mapFiltersContainer.reset();
+  setMapInitState();
+});
 
 formTitleContainer.addEventListener('input', () => {
   const valueLength = formTitleContainer.value.length;
@@ -120,4 +165,4 @@ formCapacityContainer.addEventListener('change', () => {
 
 disablePage();
 
-export {enablePage, updateAddress};
+export {enableMapFilter, enableAdForm, updateAddress};

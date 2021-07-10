@@ -67,7 +67,7 @@ const setSimpleProperties = (card, data) => {
 
 const setFeaturesProperty = (card, data) => {
   const featuresContainer = card.querySelector('.popup__features');
-  const cardFeatures = data.offer.features;
+  const cardFeatures = data.offer.features ? data.offer.features : [];
   const unusedFeatures = AD_FEATURES.filter((feature) => !cardFeatures.includes(feature));
 
   if (cardFeatures.length) {
@@ -81,7 +81,7 @@ const setFeaturesProperty = (card, data) => {
 
 const setImagesProperty = (card, data) => {
   const imageContainer = card.querySelector('.popup__photos');
-  const imagePaths = data.offer.photos;
+  const imagePaths = data.offer.photos ? data.offer.photos : [];
 
   if (imagePaths.length) {
     for (const imagePath of imagePaths) {
