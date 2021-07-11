@@ -1,6 +1,14 @@
-import {AD_TYPES_RU, AD_FEATURES} from './constants.js';
-
 const cardTemplateContainer = document.querySelector('#card').content.querySelector('.popup');
+
+const AD_FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+
+const AD_TYPES_RU = {
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalow: 'Бунгало',
+  hotel: 'Отель',
+};
 
 const setSimpleProperties = (card, data) => {
   const cardProperties = [
@@ -54,7 +62,7 @@ const setSimpleProperties = (card, data) => {
     },
   ];
 
-  for (const cardProperty of cardProperties) {
+  cardProperties.forEach((cardProperty) => {
     const propertyContainer = card.querySelector(cardProperty.selector);
 
     if (cardProperty.initValue && propertyContainer) {
@@ -62,18 +70,18 @@ const setSimpleProperties = (card, data) => {
     } else {
       propertyContainer.remove();
     }
-  }
+  });
 };
 
 const setFeaturesProperty = (card, data) => {
   const featuresContainer = card.querySelector('.popup__features');
-  const cardFeatures = data.offer.features ? data.offer.features : [];
+  const cardFeatures = data.offer.features || [];
   const unusedFeatures = AD_FEATURES.filter((feature) => !cardFeatures.includes(feature));
 
   if (cardFeatures.length) {
-    for (const unusedFeature of unusedFeatures) {
+    unusedFeatures.forEach((unusedFeature) => {
       featuresContainer.querySelector(`[class*="--${unusedFeature}"]`).remove();
-    }
+    });
   } else {
     featuresContainer.remove();
   }
@@ -81,15 +89,15 @@ const setFeaturesProperty = (card, data) => {
 
 const setImagesProperty = (card, data) => {
   const imageContainer = card.querySelector('.popup__photos');
-  const imagePaths = data.offer.photos ? data.offer.photos : [];
+  const imagePaths = data.offer.photos || [];
 
   if (imagePaths.length) {
-    for (const imagePath of imagePaths) {
+    imagePaths.forEach((imagePath) => {
       const cardImage = card.querySelector('.popup__photo').cloneNode();
 
       cardImage.src = imagePath;
       imageContainer.appendChild(cardImage);
-    }
+    });
 
     imageContainer.children[0].remove();
   } else {

@@ -28,7 +28,6 @@ const showAdsLoadError = () => {
 };
 
 const createMarker = (ad) => {
-  const {location: {lat, lng}} = ad;
   const icon = L.icon({
     iconUrl: ICON_CARD_PATH,
     iconSize: [ICON_CARD_WIDTH, ICON_CARD_HEIGHT],
@@ -36,10 +35,7 @@ const createMarker = (ad) => {
   });
 
   const cardMarker = L.marker(
-    {
-      lat,
-      lng,
-    },
+    ad.location,
     {
       icon,
     },
@@ -54,18 +50,6 @@ const createMarker = (ad) => {
       },
     );
 };
-
-const getAds = createFetch(
-  (ads) => {
-    enableMapFilter();
-    ads.forEach((ad) => {
-      createMarker(ad);
-    });
-  },
-  (error) => {
-    showAdsLoadError();
-    throw new Error(`${error}`);
-  });
 
 const mainPinIcon = L.icon({
   iconUrl: ICON_MAIN_PATH,
@@ -98,7 +82,17 @@ const setupMap = () => {
   ).addTo(map);
 
   mainMarker.addTo(map);
-  getAds.then();
+
+  createFetch(
+    (ads) => {
+      enableMapFilter();
+      ads.forEach((ad) => {
+        createMarker(ad);
+      });
+    },
+    () => {
+      showAdsLoadError();
+    }).then();
 };
 
 const initMap = () => {

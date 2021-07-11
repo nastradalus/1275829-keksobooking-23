@@ -6,6 +6,12 @@ const formControlsContainers = document.querySelectorAll('.ad-form-header, .ad-f
 const mapFiltersContainer = document.querySelector('.map__filters');
 const mapFiltersControlsContainers = document.querySelectorAll('.map__filter, .map__checkbox');
 
+const formResetContainer = document.querySelector('.ad-form__reset');
+const messageContainer = {
+  success: document.querySelector('#success').content.querySelector('.success'),
+  error: document.querySelector('#error').content.querySelector('.error'),
+};
+
 const formDisableClass = 'ad-form--disabled';
 const mapFiltersDisableClass = 'map__filters--disabled';
 
@@ -17,7 +23,6 @@ const formTimeOutContainer = document.querySelector('#timeout');
 const formRoomNumberContainer = document.querySelector('#room_number');
 const formCapacityContainer = document.querySelector('#capacity');
 const formAddressContainer = document.querySelector('#address');
-const formResetContainer = document.querySelector('.ad-form__reset');
 
 const typePrice = {
   bungalow: 0,
@@ -34,45 +39,41 @@ const disablePage = () => {
   formContainer.classList.add(formDisableClass);
   mapFiltersContainer.classList.add(mapFiltersDisableClass);
 
-  for (const formControlsContainer of formControlsContainers) {
-    formControlsContainer.disabled = true;
-  }
-
-  for (const mapFiltersControlsContainer of mapFiltersControlsContainers) {
-    mapFiltersControlsContainer.disabled = true;
-  }
+  formControlsContainers.forEach((formControlContainer) => formControlContainer.disabled = true);
+  mapFiltersControlsContainers.forEach((mapFiltersControlsContainer) => mapFiltersControlsContainer.disabled = true);
 };
 
 const enableMapFilter = () => {
   mapFiltersContainer.classList.remove(mapFiltersDisableClass);
-
-  for (const mapFiltersControlsContainer of mapFiltersControlsContainers) {
-    mapFiltersControlsContainer.disabled = false;
-  }
+  mapFiltersControlsContainers.forEach((mapFiltersControlsContainer) => mapFiltersControlsContainer.disabled = false);
 };
 
 const enableAdForm = () => {
   formContainer.classList.remove(formDisableClass);
-
-  for (const formControlsContainer of formControlsContainers) {
-    formControlsContainer.disabled = false;
-  }
+  formControlsContainers.forEach((formControlContainer) => formControlContainer.disabled = false);
 };
 
 const updateAddress = (lat, lng) => {
   formAddressContainer.value = `${lat}, ${lng}`;
 };
 
-const showStatusMessage = (status) => {
-  const message = document.querySelector(`#${status}`).content.querySelector(`.${status}`).cloneNode(true);
-  document.querySelector('body').appendChild(message);
+const messageEscKeydownHandler = (event) => {
+  if (event.key === 'Escape' || event.key === 'Esc') {
+    event.preventDefault();
+    document.querySelectorAll('.success, .error').forEach((message) => message.remove());
+    document.removeEventListener('keydown', messageEscKeydownHandler);
+  }
+};
 
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' || event.key === 'Esc') {
-      event.preventDefault();
-      message.remove();
-    }
-  });
+const showStatusMessage = (status) => {
+  const message = messageContainer[status];
+
+  if (!message) {
+    return;
+  }
+
+  document.querySelector('body').appendChild(message);
+  document.addEventListener('keydown', messageEscKeydownHandler);
 
   message.addEventListener('click', () => {
     message.remove();
