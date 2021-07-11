@@ -1,7 +1,16 @@
+import {sendFormData} from './create-fetch.js';
+import {setInitMapState} from './map.js';
+
 const formContainer = document.querySelector('.ad-form');
 const formControlsContainers = document.querySelectorAll('.ad-form-header, .ad-form__element');
 const mapFiltersContainer = document.querySelector('.map__filters');
 const mapFiltersControlsContainers = document.querySelectorAll('.map__filter, .map__checkbox');
+
+const formResetContainer = document.querySelector('.ad-form__reset');
+const messageContainer = {
+  success: document.querySelector('#success').content.querySelector('.success'),
+  error: document.querySelector('#error').content.querySelector('.error'),
+};
 
 const formDisableClass = 'ad-form--disabled';
 const mapFiltersDisableClass = 'map__filters--disabled';
@@ -30,31 +39,74 @@ const disablePage = () => {
   formContainer.classList.add(formDisableClass);
   mapFiltersContainer.classList.add(mapFiltersDisableClass);
 
-  for (const formControlsContainer of formControlsContainers) {
-    formControlsContainer.disabled = true;
-  }
-
-  for (const mapFiltersControlsContainer of mapFiltersControlsContainers) {
-    mapFiltersControlsContainer.disabled = true;
-  }
+  formControlsContainers.forEach((formControlContainer) => formControlContainer.disabled = true);
+  mapFiltersControlsContainers.forEach((mapFiltersControlsContainer) => mapFiltersControlsContainer.disabled = true);
 };
 
-const enablePage = () => {
-  formContainer.classList.remove(formDisableClass);
+const enableMapFilter = () => {
   mapFiltersContainer.classList.remove(mapFiltersDisableClass);
+  mapFiltersControlsContainers.forEach((mapFiltersControlsContainer) => mapFiltersControlsContainer.disabled = false);
+};
 
-  for (const formControlsContainer of formControlsContainers) {
-    formControlsContainer.disabled = false;
-  }
-
-  for (const mapFiltersControlsContainer of mapFiltersControlsContainers) {
-    mapFiltersControlsContainer.disabled = false;
-  }
+const enableAdForm = () => {
+  formContainer.classList.remove(formDisableClass);
+  formControlsContainers.forEach((formControlContainer) => formControlContainer.disabled = false);
 };
 
 const updateAddress = (lat, lng) => {
   formAddressContainer.value = `${lat}, ${lng}`;
 };
+
+const messageEscKeydownHandler = (event) => {
+  if (event.key === 'Escape' || event.key === 'Esc') {
+    event.preventDefault();
+    document.querySelectorAll('.success, .error').forEach((message) => message.remove());
+    document.removeEventListener('keydown', messageEscKeydownHandler);
+  }
+};
+
+const showStatusMessage = (status) => {
+  const message = messageContainer[status];
+
+  if (!message) {
+    return;
+  }
+
+  document.querySelector('body').appendChild(message);
+  document.addEventListener('keydown', messageEscKeydownHandler);
+
+  message.addEventListener('click', () => {
+    message.remove();
+  });
+};
+
+const resetFormsAndMap = () => {
+  formContainer.reset();
+  mapFiltersContainer.reset();
+  setInitMapState();
+};
+
+formContainer.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(formContainer);
+
+  sendFormData(
+    formContainer.action,
+    formData,
+    () => {
+      showStatusMessage('success');
+      resetFormsAndMap();
+    },
+    () => {
+      showStatusMessage('error');
+    });
+});
+
+formResetContainer.addEventListener('click', (event) => {
+  event.preventDefault();
+  resetFormsAndMap();
+});
 
 formTitleContainer.addEventListener('input', () => {
   const valueLength = formTitleContainer.value.length;
@@ -118,6 +170,4 @@ formCapacityContainer.addEventListener('change', () => {
   formCapacityContainer.reportValidity();
 });
 
-disablePage();
-
-export {enablePage, updateAddress};
+export {disablePage, enableMapFilter, enableAdForm, updateAddress};

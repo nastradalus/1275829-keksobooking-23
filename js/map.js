@@ -1,7 +1,11 @@
-import {enablePage, updateAddress} from './form.js';
+import {enableAdForm, enableMapFilter, updateAddress} from './form.js';
 import {roundFloat} from './utils.js';
-import {ads} from './data.js';
 import {createCard} from './cards.js';
+import {createFetch} from './create-fetch.js';
+
+const map = L.map('map-canvas');
+const dataErrorLoadContainer = document.querySelector('#data-error').content;
+const messageContainer = document.querySelector('#map-message');
 
 const START_LAT = 35.68950;
 const START_LNG = 139.69171;
@@ -19,22 +23,33 @@ const ICON_CARD_HEIGHT = 40;
 const ICON_CARD_TIP_X = 20;
 const ICON_CARD_TIP_Y = 40;
 
-const map = L.map('map-canvas')
-  .on('load', () => {
-    enablePage();
-    updateAddress(START_LAT, START_LNG);
-  })
-  .setView({
-    lat: START_LAT,
-    lng: START_LNG,
-  }, MAP_ZOOM);
+const showAdsLoadError = () => {
+  messageContainer.appendChild(dataErrorLoadContainer);
+};
 
-L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  },
-).addTo(map);
+const createMarker = (ad) => {
+  const icon = L.icon({
+    iconUrl: ICON_CARD_PATH,
+    iconSize: [ICON_CARD_WIDTH, ICON_CARD_HEIGHT],
+    iconAnchor: [ICON_CARD_TIP_X, ICON_CARD_TIP_Y],
+  });
+
+  const cardMarker = L.marker(
+    ad.location,
+    {
+      icon,
+    },
+  );
+
+  cardMarker
+    .addTo(map)
+    .bindPopup(
+      () => createCard(ad),
+      {
+        keepInView: true,
+      },
+    );
+};
 
 const mainPinIcon = L.icon({
   iconUrl: ICON_MAIN_PATH,
@@ -53,41 +68,57 @@ const mainMarker = L.marker(
   },
 );
 
-mainMarker.addTo(map);
-
-mainMarker.on('moveend', (evt) => {
-  const coordinate = evt.target.getLatLng();
+mainMarker.on('moveend', (event) => {
+  const coordinate = event.target.getLatLng();
   updateAddress(roundFloat(coordinate.lat), roundFloat(coordinate.lng));
 });
 
-const createMarker = (ad) => {
-  const {location: {lat, lng}} = ad;
-  const icon = L.icon({
-    iconUrl: ICON_CARD_PATH,
-    iconSize: [ICON_CARD_WIDTH, ICON_CARD_HEIGHT],
-    iconAnchor: [ICON_CARD_TIP_X, ICON_CARD_TIP_Y],
-  });
-
-  const cardMarker = L.marker(
+const setupMap = () => {
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
-      lat,
-      lng,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     },
-    {
-      icon,
-    },
-  );
+  ).addTo(map);
 
-  cardMarker
-    .addTo(map)
-    .bindPopup(
-      () => createCard(ad),
-      {
-        keepInView: true,
-      },
-    );
+  mainMarker.addTo(map);
+
+  createFetch(
+    (ads) => {
+      enableMapFilter();
+      ads.forEach((ad) => {
+        createMarker(ad);
+      });
+    },
+    () => {
+      showAdsLoadError();
+    });
 };
 
-ads.forEach((ad) => {
-  createMarker(ad);
-});
+const initMap = () => {
+  map.on('load', () => {
+    setupMap();
+    enableAdForm();
+    updateAddress(START_LAT, START_LNG);
+  })
+    .setView({
+      lat: START_LAT,
+      lng: START_LNG,
+    }, MAP_ZOOM);
+};
+
+const setInitMapState = () => {
+  mainMarker.setLatLng({
+    lat: START_LAT,
+    lng: START_LNG,
+  });
+
+  mainMarker.fire('moveend');
+
+  map.setView({
+    lat: START_LAT,
+    lng: START_LNG,
+  }, MAP_ZOOM);
+};
+
+export {setInitMapState, initMap};

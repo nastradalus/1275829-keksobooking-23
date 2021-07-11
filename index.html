@@ -67,6 +67,9 @@
            </fieldset>
         </form>
       </div>
+
+      <!-- Блок для вставки сообщения ошибки -->
+      <div class="map__message" id="map-message"></div>
     </section>
 
     <!-- Форма объявления -->
@@ -106,7 +109,7 @@
         </fieldset>
         <fieldset class="ad-form__element">
           <label class="ad-form__label" for="price">Цена за ночь, руб.</label>
-          <input id="price" name="price" type="number" placeholder="5000" min="0" max="1000000" required>
+          <input id="price" name="price" type="number" placeholder="5000" min="1000" max="1000000" required>
         </fieldset>
         <fieldset class="ad-form__element ad-form__element--time">
           <label class="ad-form__label" for="timein">Время заезда и выезда</label>
@@ -229,6 +232,11 @@
       <p class="error__message">Ошибка размещения объявления</p>
       <button type="button" class="error__button">Попробовать снова</button>
     </div>
+  </template>
+
+  <!-- Сообщение об ошибке загрузки объявлений -->
+  <template id="data-error">
+    <p>Не удалось загрузить объявления. Фильтрация объявлений недоступна, но Вы можете добавить своё.</p>
   </template>
 
   <script defer src="leaflet/leaflet.js"></script>
