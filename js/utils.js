@@ -1,3 +1,1 @@
-export const roundFloat = (float) => {
-  return +float.toFixed(5);
-};
+export const roundFloat = (float) => +float.toFixed(5);
