@@ -1,6 +1,6 @@
 const ADS_FETCH_URL = 'https://23.javascript.pages.academy/keksobooking/data';
 
-const createFetch = (onSuccess, onError) =>
+const createFetch = (onSuccess, onError) => {
   fetch(
     ADS_FETCH_URL,
   )
@@ -13,8 +13,9 @@ const createFetch = (onSuccess, onError) =>
     })
     .then(onSuccess)
     .catch(onError);
+};
 
-const sendFormData = (address, data, onSuccess, onError) =>
+const sendFormData = (address, data, onSuccess, onError) => {
   fetch(
     address,
     {
@@ -31,5 +32,6 @@ const sendFormData = (address, data, onSuccess, onError) =>
     })
     .then(onSuccess)
     .catch(onError);
+};
 
 export {createFetch, sendFormData};

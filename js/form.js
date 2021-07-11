@@ -100,7 +100,7 @@ formContainer.addEventListener('submit', (event) => {
     },
     () => {
       showStatusMessage('error');
-    }).then();
+    });
 });
 
 formResetContainer.addEventListener('click', (event) => {

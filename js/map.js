@@ -92,7 +92,7 @@ const setupMap = () => {
     },
     () => {
       showAdsLoadError();
-    }).then();
+    });
 };
 
 const initMap = () => {
