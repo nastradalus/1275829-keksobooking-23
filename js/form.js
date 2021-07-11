@@ -1,5 +1,5 @@
 import {sendFormData} from './create-fetch.js';
-import {setMapInitState} from './map.js';
+import {setInitMapState} from './map.js';
 
 const formContainer = document.querySelector('.ad-form');
 const formControlsContainers = document.querySelectorAll('.ad-form-header, .ad-form__element');
@@ -17,6 +17,7 @@ const formTimeOutContainer = document.querySelector('#timeout');
 const formRoomNumberContainer = document.querySelector('#room_number');
 const formCapacityContainer = document.querySelector('#capacity');
 const formAddressContainer = document.querySelector('#address');
+const formResetContainer = document.querySelector('.ad-form__reset');
 
 const typePrice = {
   bungalow: 0,
@@ -78,6 +79,12 @@ const showStatusMessage = (status) => {
   });
 };
 
+const resetFormsAndMap = () => {
+  formContainer.reset();
+  mapFiltersContainer.reset();
+  setInitMapState();
+};
+
 formContainer.addEventListener('submit', (event) => {
   event.preventDefault();
 
@@ -88,17 +95,16 @@ formContainer.addEventListener('submit', (event) => {
     formData,
     () => {
       showStatusMessage('success');
+      resetFormsAndMap();
     },
     () => {
       showStatusMessage('error');
     }).then();
 });
 
-formContainer.addEventListener('reset', () => {
-  // event.preventDefault();
-
-  mapFiltersContainer.reset();
-  setMapInitState();
+formResetContainer.addEventListener('click', (event) => {
+  event.preventDefault();
+  resetFormsAndMap();
 });
 
 formTitleContainer.addEventListener('input', () => {
@@ -163,6 +169,4 @@ formCapacityContainer.addEventListener('change', () => {
   formCapacityContainer.reportValidity();
 });
 
-disablePage();
-
-export {enableMapFilter, enableAdForm, updateAddress};
+export {disablePage, enableMapFilter, enableAdForm, updateAddress};

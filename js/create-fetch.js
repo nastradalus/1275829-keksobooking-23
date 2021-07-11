@@ -1,4 +1,4 @@
-const createFetch = (onSuccess, onError) => () =>
+const createFetch = (onSuccess, onError) =>
   fetch(
     'https://23.javascript.pages.academy/keksobooking/data',
   )

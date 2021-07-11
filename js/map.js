@@ -23,6 +23,10 @@ const ICON_CARD_HEIGHT = 40;
 const ICON_CARD_TIP_X = 20;
 const ICON_CARD_TIP_Y = 40;
 
+const showAdsLoadError = () => {
+  messageContainer.appendChild(dataErrorLoadContainer);
+};
+
 const createMarker = (ad) => {
   const {location: {lat, lng}} = ad;
   const icon = L.icon({
@@ -59,26 +63,9 @@ const getAds = createFetch(
     });
   },
   (error) => {
-    messageContainer.appendChild(dataErrorLoadContainer);
+    showAdsLoadError();
     throw new Error(`${error}`);
   });
-
-map.on('load', () => {
-  enableAdForm();
-  updateAddress(START_LAT, START_LNG);
-  getAds().then();
-})
-  .setView({
-    lat: START_LAT,
-    lng: START_LNG,
-  }, MAP_ZOOM);
-
-L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  },
-).addTo(map);
 
 const mainPinIcon = L.icon({
   iconUrl: ICON_MAIN_PATH,
@@ -97,18 +84,42 @@ const mainMarker = L.marker(
   },
 );
 
-mainMarker.addTo(map);
-
-mainMarker.on('moveend', (evt) => {
-  const coordinate = evt.target.getLatLng();
+mainMarker.on('moveend', (event) => {
+  const coordinate = event.target.getLatLng();
   updateAddress(roundFloat(coordinate.lat), roundFloat(coordinate.lng));
 });
 
-const setMapInitState = () => {
+const setupMap = () => {
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    },
+  ).addTo(map);
+
+  mainMarker.addTo(map);
+  getAds.then();
+};
+
+const initMap = () => {
+  map.on('load', () => {
+    setupMap();
+    enableAdForm();
+    updateAddress(START_LAT, START_LNG);
+  })
+    .setView({
+      lat: START_LAT,
+      lng: START_LNG,
+    }, MAP_ZOOM);
+};
+
+const setInitMapState = () => {
   mainMarker.setLatLng({
     lat: START_LAT,
     lng: START_LNG,
   });
+
+  mainMarker.fire('moveend');
 
   map.setView({
     lat: START_LAT,
@@ -116,4 +127,4 @@ const setMapInitState = () => {
   }, MAP_ZOOM);
 };
 
-export {setMapInitState};
+export {setInitMapState, initMap};

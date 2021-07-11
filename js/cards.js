@@ -1,6 +1,6 @@
 import {AD_TYPES_RU, AD_FEATURES} from './constants.js';
 
-const cardTemplateContainer = document.querySelector('#card').content;
+const cardTemplateContainer = document.querySelector('#card').content.querySelector('.popup');
 
 const setSimpleProperties = (card, data) => {
   const cardProperties = [
