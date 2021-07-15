@@ -25,33 +25,38 @@ const PRICE_VALUES = {
     min: 50000,
     max: Infinity,
   },
+  any: {
+    min: 0,
+    max: Infinity,
+  },
 };
 
 let timerId = 0;
 
-const filterAds = (ads) =>
-  ads
-    .filter((ad) => filterTypeContainer.value === ALL_OPTIONS || ad.offer.type === filterTypeContainer.value)
-    .filter((ad) => filterPriceContainer.value === ALL_OPTIONS
-      || (ad.offer.price <= PRICE_VALUES[filterPriceContainer.value].max
-        && ad.offer.price >= PRICE_VALUES[filterPriceContainer.value].min))
-    .filter((ad) => filterRoomsContainer.value === ALL_OPTIONS || ad.offer.rooms === +filterRoomsContainer.value)
-    .filter((ad) => filterGuestsContainer.value === ALL_OPTIONS || ad.offer.guests === +filterGuestsContainer.value)
+const filterAds = (ads) => {
+  const filterType = filterTypeContainer.value;
+  const filterPrice = filterPriceContainer.value;
+  const filterRooms = filterRoomsContainer.value;
+  const filterGuests = filterGuestsContainer.value;
+
+  const maxPrice = PRICE_VALUES[filterPrice].max;
+  const minPrice = PRICE_VALUES[filterPrice].min;
+
+  return ads
+    .filter((ad) => filterType === ALL_OPTIONS || ad.offer.type === filterType)
+    .filter((ad) => filterPrice === ALL_OPTIONS || (ad.offer.price <= maxPrice && ad.offer.price >= minPrice))
+    .filter((ad) => filterRooms === ALL_OPTIONS || ad.offer.rooms === +filterRooms)
+    .filter((ad) => filterGuests === ALL_OPTIONS || ad.offer.guests === +filterGuests)
     .filter((ad) => {
       const adFeatures = ad.offer.features || [];
       const requiredFeatures = filterFeaturesContainers
         .map((filterFeaturesContainer) => (filterFeaturesContainer.checked) ? filterFeaturesContainer.value : '')
         .filter((feature) => feature !== '');
 
-      for (const requiredFeature of requiredFeatures) {
-        if (!adFeatures.includes(requiredFeature)) {
-          return false;
-        }
-      }
-
-      return true;
+      return requiredFeatures.every((requiredFeature) => adFeatures.includes(requiredFeature));
     })
     .slice(0, MAX_COUNT);
+};
 
 const filterChangeHandler = () => {
   clearTimeout(timerId);
