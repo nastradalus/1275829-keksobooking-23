@@ -43,17 +43,17 @@ const filterAds = (ads) => {
   const minPrice = PRICE_VALUES[filterPrice].min;
 
   return ads
-    .filter((ad) => filterType === ALL_OPTIONS || ad.offer.type === filterType)
-    .filter((ad) => filterPrice === ALL_OPTIONS || (ad.offer.price <= maxPrice && ad.offer.price >= minPrice))
-    .filter((ad) => filterRooms === ALL_OPTIONS || ad.offer.rooms === +filterRooms)
-    .filter((ad) => filterGuests === ALL_OPTIONS || ad.offer.guests === +filterGuests)
-    .filter((ad) => {
-      const adFeatures = ad.offer.features || [];
-      const requiredFeatures = filterFeaturesContainers
+    .filter(({offer: {type}}) => filterType === ALL_OPTIONS || type === filterType)
+    .filter(({offer: {price}}) => filterPrice === ALL_OPTIONS || (price <= maxPrice && price >= minPrice))
+    .filter(({offer: {rooms}}) => filterRooms === ALL_OPTIONS || rooms === +filterRooms)
+    .filter(({offer: {guests}}) => filterGuests === ALL_OPTIONS || guests === +filterGuests)
+    .filter(({offer: {features}}) => {
+      const adFeatures = features || [];
+      const filterFeatures = filterFeaturesContainers
         .map((filterFeaturesContainer) => (filterFeaturesContainer.checked) ? filterFeaturesContainer.value : '')
         .filter((feature) => feature !== '');
 
-      return requiredFeatures.every((requiredFeature) => adFeatures.includes(requiredFeature));
+      return filterFeatures.every((filterFeature) => adFeatures.includes(filterFeature));
     })
     .slice(0, MAX_COUNT);
 };
