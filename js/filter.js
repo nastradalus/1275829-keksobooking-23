@@ -33,6 +33,19 @@ const PRICE_VALUES = {
 
 let timerId = 0;
 
+const filterTypeCondition = ({offer: {type}}, filterValue) => filterValue === ALL_OPTIONS || type === filterValue;
+const filterPriceCondition = ({offer: {price}}, filterValue, maxValue, minValue) => filterValue === ALL_OPTIONS || (price <= maxValue && price >= minValue);
+const filterRoomsCondition = ({offer: {rooms}}, filterValue) => filterValue === ALL_OPTIONS || rooms === +filterValue;
+const filterGuestsCondition = ({offer: {guests}}, filterValue) => filterValue === ALL_OPTIONS || guests === +filterValue;
+const filterFeaturesCondition = ({offer: {features}}) => {
+  const adFeatures = features || [];
+  const filterFeatures = filterFeaturesContainers
+    .map((filterFeaturesContainer) => (filterFeaturesContainer.checked) ? filterFeaturesContainer.value : '')
+    .filter((feature) => feature !== '');
+
+  return filterFeatures.every((filterFeature) => adFeatures.includes(filterFeature));
+};
+
 const filterAds = (ads) => {
   const filterType = filterTypeContainer.value;
   const filterPrice = filterPriceContainer.value;
@@ -42,23 +55,14 @@ const filterAds = (ads) => {
   const maxPrice = PRICE_VALUES[filterPrice].max;
   const minPrice = PRICE_VALUES[filterPrice].min;
 
-  const filterTypeCondition = ({offer: {type}}) => filterType === ALL_OPTIONS || type === filterType;
-  const filterPriceCondition = ({offer: {price}}) => filterPrice === ALL_OPTIONS || (price <= maxPrice && price >= minPrice);
-  const filterRoomsCondition = ({offer: {rooms}}) => filterRooms === ALL_OPTIONS || rooms === +filterRooms;
-  const filterGuestsCondition = ({offer: {guests}}) => filterGuests === ALL_OPTIONS || guests === +filterGuests;
-  const filterFeaturesCondition = ({offer: {features}}) => {
-    const adFeatures = features || [];
-    const filterFeatures = filterFeaturesContainers
-      .map((filterFeaturesContainer) => (filterFeaturesContainer.checked) ? filterFeaturesContainer.value : '')
-      .filter((feature) => feature !== '');
-
-    return filterFeatures.every((filterFeature) => adFeatures.includes(filterFeature));
-  };
-
   const filteredAds = [];
 
   for (const ad of ads) {
-    if (filterTypeCondition(ad) && filterPriceCondition(ad) && filterRoomsCondition(ad) && filterGuestsCondition(ad) && filterFeaturesCondition(ad)) {
+    if (filterTypeCondition(ad, filterType)
+      && filterPriceCondition(ad, filterPrice, maxPrice, minPrice)
+      && filterRoomsCondition(ad, filterRooms)
+      && filterGuestsCondition(ad, filterGuests)
+      && filterFeaturesCondition(ad)) {
       filteredAds.push(ad);
 
       if (filteredAds.length >= MAX_COUNT) {
