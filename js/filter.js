@@ -42,20 +42,32 @@ const filterAds = (ads) => {
   const maxPrice = PRICE_VALUES[filterPrice].max;
   const minPrice = PRICE_VALUES[filterPrice].min;
 
-  return ads
-    .filter(({offer: {type}}) => filterType === ALL_OPTIONS || type === filterType)
-    .filter(({offer: {price}}) => filterPrice === ALL_OPTIONS || (price <= maxPrice && price >= minPrice))
-    .filter(({offer: {rooms}}) => filterRooms === ALL_OPTIONS || rooms === +filterRooms)
-    .filter(({offer: {guests}}) => filterGuests === ALL_OPTIONS || guests === +filterGuests)
-    .filter(({offer: {features}}) => {
-      const adFeatures = features || [];
-      const filterFeatures = filterFeaturesContainers
-        .map((filterFeaturesContainer) => (filterFeaturesContainer.checked) ? filterFeaturesContainer.value : '')
-        .filter((feature) => feature !== '');
+  const filterTypeCondition = ({offer: {type}}) => filterType === ALL_OPTIONS || type === filterType;
+  const filterPriceCondition = ({offer: {price}}) => filterPrice === ALL_OPTIONS || (price <= maxPrice && price >= minPrice);
+  const filterRoomsCondition = ({offer: {rooms}}) => filterRooms === ALL_OPTIONS || rooms === +filterRooms;
+  const filterGuestsCondition = ({offer: {guests}}) => filterGuests === ALL_OPTIONS || guests === +filterGuests;
+  const filterFeaturesCondition = ({offer: {features}}) => {
+    const adFeatures = features || [];
+    const filterFeatures = filterFeaturesContainers
+      .map((filterFeaturesContainer) => (filterFeaturesContainer.checked) ? filterFeaturesContainer.value : '')
+      .filter((feature) => feature !== '');
 
-      return filterFeatures.every((filterFeature) => adFeatures.includes(filterFeature));
-    })
-    .slice(0, MAX_COUNT);
+    return filterFeatures.every((filterFeature) => adFeatures.includes(filterFeature));
+  };
+
+  const filteredAds = [];
+
+  for (const ad of ads) {
+    if (filterTypeCondition(ad) && filterPriceCondition(ad) && filterRoomsCondition(ad) && filterGuestsCondition(ad) && filterFeaturesCondition(ad)) {
+      filteredAds.push(ad);
+
+      if (filteredAds.length >= MAX_COUNT) {
+        break;
+      }
+    }
+  }
+
+  return filteredAds;
 };
 
 const filterChangeHandler = () => {
