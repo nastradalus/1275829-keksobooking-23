@@ -1,11 +1,11 @@
 import {enableAdForm, enableMapFilter, updateAddress} from './form.js';
 import {roundFloat} from './utils.js';
 import {createCard} from './cards.js';
-import {createFetch} from './create-fetch.js';
+import {getAdsFromServer} from './create-fetch.js';
+import {filterAds} from './filter.js';
 
 const map = L.map('map-canvas');
-const dataErrorLoadContainer = document.querySelector('#data-error').content;
-const messageContainer = document.querySelector('#map-message');
+const markerGroup = L.layerGroup();
 
 const START_LAT = 35.68950;
 const START_LNG = 139.69171;
@@ -22,6 +22,26 @@ const ICON_CARD_WIDTH = 40;
 const ICON_CARD_HEIGHT = 40;
 const ICON_CARD_TIP_X = 20;
 const ICON_CARD_TIP_Y = 40;
+
+const mainPinIcon = L.icon({
+  iconUrl: ICON_MAIN_PATH,
+  iconSize: [ICON_MAIN_WIDTH, ICON_MAIN_HEIGHT],
+  iconAnchor: [ICON_MAIN_TIP_X, ICON_MAIN_TIP_Y],
+});
+
+const mainMarker = L.marker(
+  {
+    lat: START_LAT,
+    lng: START_LNG,
+  },
+  {
+    draggable: true,
+    icon: mainPinIcon,
+  },
+);
+
+const dataErrorLoadContainer = document.querySelector('#data-error').content;
+const messageContainer = document.querySelector('#map-message');
 
 const showAdsLoadError = () => {
   messageContainer.appendChild(dataErrorLoadContainer);
@@ -42,7 +62,7 @@ const createMarker = (ad) => {
   );
 
   cardMarker
-    .addTo(map)
+    .addTo(markerGroup)
     .bindPopup(
       () => createCard(ad),
       {
@@ -51,27 +71,18 @@ const createMarker = (ad) => {
     );
 };
 
-const mainPinIcon = L.icon({
-  iconUrl: ICON_MAIN_PATH,
-  iconSize: [ICON_MAIN_WIDTH, ICON_MAIN_HEIGHT],
-  iconAnchor: [ICON_MAIN_TIP_X, ICON_MAIN_TIP_Y],
-});
-
-const mainMarker = L.marker(
-  {
-    lat: START_LAT,
-    lng: START_LNG,
-  },
-  {
-    draggable: true,
-    icon: mainPinIcon,
-  },
-);
-
 mainMarker.on('moveend', (event) => {
   const coordinate = event.target.getLatLng();
   updateAddress(roundFloat(coordinate.lat), roundFloat(coordinate.lng));
 });
+
+const addMarkers = (ads) => {
+  markerGroup.clearLayers();
+
+  ads.forEach((ad) => {
+    createMarker(ad);
+  });
+};
 
 const setupMap = () => {
   L.tileLayer(
@@ -81,14 +92,13 @@ const setupMap = () => {
     },
   ).addTo(map);
 
+  markerGroup.addTo(map);
   mainMarker.addTo(map);
 
-  createFetch(
+  getAdsFromServer(
     (ads) => {
       enableMapFilter();
-      ads.forEach((ad) => {
-        createMarker(ad);
-      });
+      addMarkers(filterAds(ads));
     },
     () => {
       showAdsLoadError();
@@ -121,4 +131,4 @@ const setInitMapState = () => {
   }, MAP_ZOOM);
 };
 
-export {setInitMapState, initMap};
+export {setInitMapState, initMap, addMarkers, showAdsLoadError};
