@@ -23,6 +23,11 @@ const formTimeOutContainer = document.querySelector('#timeout');
 const formRoomNumberContainer = document.querySelector('#room_number');
 const formCapacityContainer = document.querySelector('#capacity');
 const formAddressContainer = document.querySelector('#address');
+const formAvatarContainer = document.querySelector('#avatar');
+const formPhotoContainer = document.querySelector('#images');
+
+const formAvatarHolderContainer = document.querySelector('.ad-form-header__preview');
+const formPhotoHolderContainer = document.querySelector('.ad-form__photo');
 
 const typePrice = {
   bungalow: 0,
@@ -34,6 +39,8 @@ const typePrice = {
 
 const MAX_ROOMS = 100;
 const MIN_CAPACITY = 0;
+
+const FILE_TYPES = ['jpg', 'png'];
 
 const disablePage = () => {
   formContainer.classList.add(formDisableClass);
@@ -84,6 +91,28 @@ const resetFormsAndMap = () => {
   formContainer.reset();
   mapFiltersContainer.reset();
   setInitMapState();
+};
+
+const insertImage = (file, container, sizes) => {
+  const fileName = file.name.toLowerCase();
+
+  const isCorrectType = FILE_TYPES.some((fileType) => fileName.endsWith(fileType));
+
+  if (isCorrectType) {
+    const reader = new FileReader();
+    const image = document.createElement('img');
+    image.width = sizes.width;
+    image.height = sizes.height;
+
+    reader.addEventListener('load', () => {
+      image.src = reader.result;
+      container.replaceChildren(image);
+    });
+
+    reader.readAsDataURL(file);
+  }
+
+  return isCorrectType;
 };
 
 formContainer.addEventListener('submit', (event) => {
@@ -168,6 +197,30 @@ formCapacityContainer.addEventListener('change', () => {
   }
 
   formCapacityContainer.reportValidity();
+});
+
+formAvatarContainer.addEventListener('change', () => {
+  const fileAvatar = formAvatarContainer.files[0];
+
+  if (!insertImage(fileAvatar, formAvatarHolderContainer, {width: 40, height: 44})) {
+    formAvatarContainer.setCustomValidity(`Можно загружать только файлы в формате: ${FILE_TYPES.join(', ')}`);
+  } else {
+    formAvatarContainer.setCustomValidity('');
+  }
+
+  formAvatarContainer.reportValidity();
+});
+
+formPhotoContainer.addEventListener('change', () => {
+  const filePhoto = formPhotoContainer.files[0];
+
+  if (!insertImage(filePhoto, formPhotoHolderContainer, {width: 70, height: 70})) {
+    formPhotoContainer.setCustomValidity(`Можно загружать только файлы в формате: ${FILE_TYPES.join(', ')}`);
+  } else {
+    formPhotoContainer.setCustomValidity('');
+  }
+
+  formPhotoContainer.reportValidity();
 });
 
 export {disablePage, enableMapFilter, enableAdForm, updateAddress};
