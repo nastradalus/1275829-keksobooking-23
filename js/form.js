@@ -42,34 +42,63 @@ const MIN_CAPACITY = 0;
 
 const FILE_TYPES = ['jpg', 'png'];
 
+const AVATAR_WIDTH = 40;
+const AVATAR_HEIGHT = 44;
+
+const PHOTO_WIDTH = 70;
+const PHOTO_HEIGHT = 70;
+
 const disablePage = () => {
   formContainer.classList.add(formDisableClass);
   mapFiltersContainer.classList.add(mapFiltersDisableClass);
 
-  formControlsContainers.forEach((formControlContainer) => formControlContainer.disabled = true);
-  mapFiltersControlsContainers.forEach((mapFiltersControlsContainer) => mapFiltersControlsContainer.disabled = true);
+  formControlsContainers.forEach((formControlContainer) => {
+    formControlContainer.disabled = true;
+  });
+  mapFiltersControlsContainers.forEach((mapFiltersControlsContainer) => {
+    mapFiltersControlsContainer.disabled = true;
+  });
 };
 
 const enableMapFilter = () => {
   mapFiltersContainer.classList.remove(mapFiltersDisableClass);
-  mapFiltersControlsContainers.forEach((mapFiltersControlsContainer) => mapFiltersControlsContainer.disabled = false);
+  mapFiltersControlsContainers.forEach((mapFiltersControlsContainer) => {
+    mapFiltersControlsContainer.disabled = false;
+  });
 };
 
 const enableAdForm = () => {
   formContainer.classList.remove(formDisableClass);
-  formControlsContainers.forEach((formControlContainer) => formControlContainer.disabled = false);
+  formControlsContainers.forEach((formControlContainer) => {
+    formControlContainer.disabled = false;
+  });
 };
 
 const updateAddress = (lat, lng) => {
   formAddressContainer.value = `${lat}, ${lng}`;
 };
 
-const messageEscKeydownHandler = (event) => {
-  if (event.key === 'Escape' || event.key === 'Esc') {
-    event.preventDefault();
+const messageEscKeydownHandler = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    evt.preventDefault();
     document.querySelectorAll('.success, .error').forEach((message) => message.remove());
     document.removeEventListener('keydown', messageEscKeydownHandler);
   }
+};
+
+const roomsAndGuestsChangeHandler = () => {
+  const capacityValue = +formCapacityContainer.value;
+  const roomValue = +formRoomNumberContainer.value;
+
+  if (roomValue !== MAX_ROOMS && (capacityValue > roomValue || capacityValue === MIN_CAPACITY)) {
+    formCapacityContainer.setCustomValidity(`Для текущего количества комнат возможное количество гостей: не меньше 1 и не больше ${roomValue}`);
+  } else if (roomValue === MAX_ROOMS && capacityValue !== MIN_CAPACITY) {
+    formCapacityContainer.setCustomValidity('100 комнат не для гостей');
+  } else {
+    formCapacityContainer.setCustomValidity('');
+  }
+
+  formCapacityContainer.reportValidity();
 };
 
 const showStatusMessage = (status) => {
@@ -90,6 +119,8 @@ const showStatusMessage = (status) => {
 const resetFormsAndMap = () => {
   formContainer.reset();
   mapFiltersContainer.reset();
+  formAvatarHolderContainer.replaceChildren();
+  formPhotoHolderContainer.replaceChildren();
   setInitMapState();
 };
 
@@ -115,8 +146,8 @@ const insertImage = (file, container, sizes) => {
   return isCorrectType;
 };
 
-formContainer.addEventListener('submit', (event) => {
-  event.preventDefault();
+formContainer.addEventListener('submit', (evt) => {
+  evt.preventDefault();
 
   const formData = new FormData(formContainer);
 
@@ -132,8 +163,8 @@ formContainer.addEventListener('submit', (event) => {
     });
 });
 
-formResetContainer.addEventListener('click', (event) => {
-  event.preventDefault();
+formResetContainer.addEventListener('click', (evt) => {
+  evt.preventDefault();
   resetFormsAndMap();
 });
 
@@ -184,25 +215,14 @@ formTimeOutContainer.addEventListener('change', () => {
   formTimeInContainer.value = formTimeOutContainer.value;
 });
 
-formCapacityContainer.addEventListener('change', () => {
-  const capacityValue = +formCapacityContainer.value;
-  const roomValue = +formRoomNumberContainer.value;
+formRoomNumberContainer.addEventListener('change', roomsAndGuestsChangeHandler);
 
-  if (roomValue !== MAX_ROOMS && (capacityValue > roomValue || capacityValue === MIN_CAPACITY)) {
-    formCapacityContainer.setCustomValidity(`Для текущего количества комнат возможное количество гостей: не меньше 1 и не больше ${roomValue}`);
-  } else if (roomValue === MAX_ROOMS && capacityValue !== MIN_CAPACITY) {
-    formCapacityContainer.setCustomValidity('100 комнат не для гостей');
-  } else {
-    formCapacityContainer.setCustomValidity('');
-  }
-
-  formCapacityContainer.reportValidity();
-});
+formCapacityContainer.addEventListener('change', roomsAndGuestsChangeHandler);
 
 formAvatarContainer.addEventListener('change', () => {
   const fileAvatar = formAvatarContainer.files[0];
 
-  if (!insertImage(fileAvatar, formAvatarHolderContainer, {width: 40, height: 44})) {
+  if (!insertImage(fileAvatar, formAvatarHolderContainer, {width: AVATAR_WIDTH, height: AVATAR_HEIGHT})) {
     formAvatarContainer.setCustomValidity(`Можно загружать только файлы в формате: ${FILE_TYPES.join(', ')}`);
   } else {
     formAvatarContainer.setCustomValidity('');
@@ -214,7 +234,7 @@ formAvatarContainer.addEventListener('change', () => {
 formPhotoContainer.addEventListener('change', () => {
   const filePhoto = formPhotoContainer.files[0];
 
-  if (!insertImage(filePhoto, formPhotoHolderContainer, {width: 70, height: 70})) {
+  if (!insertImage(filePhoto, formPhotoHolderContainer, {width: PHOTO_WIDTH, height: PHOTO_HEIGHT})) {
     formPhotoContainer.setCustomValidity(`Можно загружать только файлы в формате: ${FILE_TYPES.join(', ')}`);
   } else {
     formPhotoContainer.setCustomValidity('');

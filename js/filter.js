@@ -2,6 +2,7 @@ import {getAdsFromServer} from './create-fetch.js';
 import {addMarkers, showAdsLoadError} from './map.js';
 
 const filterContainers = document.querySelectorAll('.map__filters select, .map__filters input');
+const filterFormContainer = document.querySelector('.map__filters');
 
 const filterTypeContainer = document.querySelector('#housing-type');
 const filterPriceContainer = document.querySelector('#housing-price');
@@ -74,7 +75,7 @@ const filterAds = (ads) => {
   return filteredAds;
 };
 
-const filterChangeHandler = () => {
+const filterChangeAndResetHandler = () => {
   clearTimeout(timerId);
   timerId = setTimeout(() => {
     getAdsFromServer(
@@ -87,8 +88,10 @@ const filterChangeHandler = () => {
   }, DELAY);
 };
 
+filterFormContainer.addEventListener('reset', filterChangeAndResetHandler);
+
 filterContainers.forEach((filterContainer) => {
-  filterContainer.addEventListener('change', filterChangeHandler);
+  filterContainer.addEventListener('change', filterChangeAndResetHandler);
 });
 
 export {filterAds};

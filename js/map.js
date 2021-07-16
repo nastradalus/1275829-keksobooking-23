@@ -71,8 +71,8 @@ const createMarker = (ad) => {
     );
 };
 
-mainMarker.on('moveend', (event) => {
-  const coordinate = event.target.getLatLng();
+mainMarker.on('moveend', (evt) => {
+  const coordinate = evt.target.getLatLng();
   updateAddress(roundFloat(coordinate.lat), roundFloat(coordinate.lng));
 });
 
